@@ -1,3 +1,15 @@
+<?php
+require_once('../controller/productosController.php');
+
+session_start();
+
+if (isset($_GET['search'])) {
+  $termino = $_GET['search'];
+  $resultados = productosController::buscarProductos($termino);
+  include 'resultados.php';
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,10 +54,10 @@
         <img src="https://micostaricadeantano.com/wp-content/uploads/2022/09/historia01.webp?w=1000" class="d-block w-100 rounded" alt="..." height="400px;">
       </div>
       <div class="carousel-item">
-        <img src="https://www.larepublica.net/storage/images/2021/04/30/20210430101230.cafe-tarrazu.jpg" class="d-block w-100 rounded" alt="..." height="400px;">
+        <img src="https://perfectdailygrind.com/es/wp-content/uploads/sites/2/2021/02/finca-de-cafe%CC%81-grande-Cover.jpg" class="d-block w-100 rounded" alt="..." height="400px;">
       </div>
       <div class="carousel-item">
-        <img src="https://www.larepublica.net/storage/images/2021/04/30/20210430101230.cafe-tarrazu.jpg" class="d-block w-100 rounded" alt="..." height="400px;">
+        <img src="https://perfectdailygrind.com/es/wp-content/uploads/sites/2/2021/02/finca-de-cafe%CC%81-grande-1.jpg" class="d-block w-100 rounded" alt="..." height="400px;">
       </div>
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
@@ -72,7 +84,6 @@
           <div class="card-body">
             <h5 class="card-title">TYPICA M</h5>
             <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalTypicaM">Más información</button>
-            <button type="button" class="btn btn-outline-primary">Comprar</button>
           </div>
         </div>
       </div>
@@ -82,7 +93,6 @@
           <div class="card-body">
             <h5 class="card-title">CATURRA - CATUAÍ ROJO</h5>
             <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalCaturra">Más información</button>
-            <button type="button" class="btn btn-outline-primary">Comprar</button>
           </div>
         </div>
       </div>
@@ -92,7 +102,6 @@
           <div class="card-body mx-auto">
             <h5 class="card-title">CATUAÍ ROJO</h5>
             <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalCatuai">Más información</button>
-            <button type="button" class="btn btn-outline-primary">Comprar</button>
           </div>
         </div>
       </div>

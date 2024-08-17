@@ -47,15 +47,15 @@
           </ul>
         </li>
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-warning" type="submit">Buscar</button>
+      <form class="d-flex" role="search" action="index.php" method="GET">
+      <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">        
+      <button class="btn btn-outline-warning" type="submit">Buscar</button>
       </form>
       <ul class="navbar-nav ml-auto">
     <li class="nav-item">
-      <a class="nav-link header-text" href="#" style="color: gold;">
+      <a class="nav-link header-text" href="carritoView.php" style="color: gold;">
         <i class="fas fa-shopping-cart"></i>
-        Carrito (0)
+        Carrito
       </a>
     </li>
   </ul>

@@ -1,3 +1,35 @@
+<?php
+
+require_once('../controller/empleadosController.php');
+
+session_start();
+
+$view_empleados = empleadosController::view_get_empleados();
+
+$empleadoController = new empleadosController();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  $datos = [
+    'nombre' => htmlspecialchars($_POST['nombre']),
+    'apellidos' => htmlspecialchars($_POST['apellidos']),
+    'email' => htmlspecialchars($_POST['email']),
+    'telefono' => htmlspecialchars($_POST['telefono']),
+    'salario' => htmlspecialchars($_POST['salario']),
+    'id_puesto' => htmlspecialchars($_POST['id_puesto']),
+    'fecha_contratacion' => htmlspecialchars($_POST['fecha_contratacion']),
+    'activo' => isset($_POST['activo']) ? 1 : 0
+  ];
+
+  if ($empleadoController->agregarEmpleados($datos)) {
+    $message = 'Empleado agregado exitosamente';
+} else {
+    $message = 'Error al agregar el empleado';
+}
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -56,52 +88,36 @@
                   <th>#</th>
                   <th>Nombre</th>
                   <th>Apellidos</th>
+                  <th>Email</th>
+                  <th>Teléfono</th>
                   <th>Salario</th>
-                  <th>Correo</th>
-                  <th>Telefono</th>
-                  <th>Fecha Contratacion</th>
-                  <th>Puesto</th>
+                  <th>Id Puesto</th>
+                  <th>Fecha Contratación</th>
                   <th>Activo</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <th scope="row">1</th>
-                  <td>Juan</td>
-                  <td>Pérez</td>
-                  <td>$50,000</td>
-                  <td>juan.perez@example.com</td>
-                  <td>555-1234</td>
-                  <td>2020-01-01</td>
-                  <td>Ingeniero</td>
-                  <td>Si</td>
-                  <td><a href="./editarEmpleado.php" class="btn btn-primary">Editar</a> <a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
-                <tr>
-                  <th scope="row">2</th>
-                  <td>Maria</td>
-                  <td>González</td>
-                  <td>$40,000</td>
-                  <td>maria.gonzalez@example.com</td>
-                  <td>555-5678</td>
-                  <td>2018-06-01</td>
-                  <td>Contadora</td>
-                  <td>Si</td>
-                  <td><a href="./editarEmpleado.php" class="btn btn-primary">Editar</a> <a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
-                <tr>
-                  <th scope="row">3</th>
-                  <td>Pedro</td>
-                  <td>Rodríguez</td>
-                  <td>$60,000</td>
-                  <td>pedro.rodriguez@example.com</td>
-                  <td>555-9012</td>
-                  <td>2019-03-01</td>
-                  <td>Gerente</td>
-                  <td>No</td>
-                  <td><a href="./editarEmpleado.php" class="btn btn-primary">Editar</a> <a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
+              <?php
+                foreach ($view_empleados as $user) {
+
+                ?>
+                  <tr>
+                    <th scope="row"><?= $user['id_empleado'] ?></th>
+                    <td><?= $user['nombre'] ?></td>
+                    <td><?= $user['apellidos'] ?></td>
+                    <td><?= $user['email'] ?></td>
+                    <td><?= $user['telefono'] ?></td>
+                    <td>$<?= $user['salario'] ?></td>
+                    <td><?= $user['id_puesto'] ?></td>
+                    <td><?= $user['fecha_contratacion'] ?></td>
+                    <td><?= $user['activo'] ? 'Si' : 'No' ?></td>
+                    <td><a href="./editarEmpleado.php?id=<?= $user['id_empleado'] ?>" class="btn btn-outline-primary">Editar</a> 
+                    <a href="./procesarEliminarEmpleado.php?id=<?= $user['id_empleado'] ?>" class="btn btn-outline-danger">Eliminar</a>                  </tr>
+                <?php
+                }
+                ?>
+
               </tbody>
             </table>
           </div>
@@ -117,7 +133,7 @@
         <h5 class="modal-title ">Agregar Empleado</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color:gold;"></button>
       </div>
-      <form th:action="@{/Empleado/guardar}" th:object="${Empleado}" method="POST" class="was-validated" enctype="multipart/form-data">
+      <form action="empleados.php" th:object="${Empleado}" method="POST" class="was-validated" enctype="multipart/form-data">
         <div class="modal-body">
           <div class="mb-3">
             <label for="nombre">Nombre</label>
@@ -132,20 +148,20 @@
             <input type="number" class="form-control" name="salario" required="true" />
           </div>
           <div class="mb-3">
-            <label for="correo">Correo</label>
-            <input type="email" class="form-control" name="correo" required="true" />
+            <label for="email">Correo</label>
+            <input type="email" class="form-control" name="email" required="true" />
           </div>
           <div class="mb-3">
             <label for="telefono">Telefono</label>
             <input type="tel" class="form-control" name="telefono" required="true" />
           </div>
           <div class="mb-3">
-            <label for="fechaContratacion">Fecha de Contratacion</label>
-            <input type="date" class="form-control" name="fechaContratacion" required="true" />
+            <label for="fecha_contratacion">Fecha de Contratacion</label>
+            <input type="date" class="form-control" name="fecha_contratacion" required="true" />
           </div>
           <div class="mb-3">
-            <label for="puesto">Puesto</label>
-            <input type="text" class="form-control" name="puesto" required="true" />
+            <label for="id_puesto">Puesto</label>
+            <input type="number" class="form-control" name="id_puesto" required="true" />
           </div>
           <div class="mb-3">
             <label for="activo">Activo</label>

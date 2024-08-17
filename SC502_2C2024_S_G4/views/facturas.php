@@ -1,3 +1,12 @@
+<?php
+
+require_once('../controller/facturasController.php');
+
+session_start();
+
+$view_facturas = facturasController::view_get_facturas();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -44,34 +53,30 @@
             <table class="table table-striped table-hover">
               <thead class="table-dark">
                 <tr>
-                  <th>#</th>
                   <th>Número de Factura</th>
-                  <th>Cliente</th>
-                  <th>Correo</th>
+                  <th>Nombre Cliente</th>
+                  <th>Apellidos Cliente</th>
                   <th>Fecha</th>
                   <th>Total</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>FACT-001</td>
-                  <td>Juan Pérez</td>
-                  <td>juanperez@example.com</td>
-                  <td>2022-01-01</td>
-                  <td>$100.00</td>
-                  <td><a href="./detallesFactura.php" class="btn btn-primary">Ver detalles</a> </td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>FACT-002</td>
-                  <td>Maria Rodríguez</td>
-                  <td>mariarodriguez@example.com</td>
-                  <td>2022-01-15</td>
-                  <td>$500.00</td>
-                  <td><a href="./detallesFactura.php" class="btn btn-primary">Ver detalles</a></td>
-                </tr>
+              <?php
+                foreach ($view_facturas as $user) {
+
+                ?>
+                  <tr>
+                    <th scope="row"><?= $user['id_factura'] ?></th>
+                    <td><?= $user['nombre'] ?></td>
+                    <td><?= $user['apellidos'] ?></td>
+                    <td><?= $user['fecha'] ?></td>
+                    <td>$<?= $user['total'] ?></td>
+                    <td><a href="./detallesFactura.php?id_factura=<?= $user['id_factura'] ?>" class="btn btn-primary">Ver detalles</a></td>
+                    </tr>
+                <?php
+                }
+                ?>
               </tbody>
             </table>
           </div>

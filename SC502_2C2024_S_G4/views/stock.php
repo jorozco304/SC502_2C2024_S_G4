@@ -1,3 +1,33 @@
+<?php
+
+require_once('../controller/productosController.php');
+
+session_start();
+
+$view_productos = productosController::view_get_Productos();
+
+$productoController = new productosController();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  $datos = [
+    'especie_cafe' => htmlspecialchars($_POST['especie_cafe']),
+    'tipo_proceso' => htmlspecialchars($_POST['tipo_proceso']),
+    'tipo_tueste' => htmlspecialchars($_POST['tipo_tueste']),
+    'descripcion' => htmlspecialchars($_POST['descripcion']),
+    'precio' => htmlspecialchars($_POST['precio']),
+    'existencias' => htmlspecialchars($_POST['existencias']),
+    'ruta_imagen' => htmlspecialchars($_POST['ruta_imagen']),
+    'activo' => isset($_POST['activo']) ? 1 : 0
+  ];
+
+  if ($productoController->agregarProducto($datos)) {
+    $message = 'Producto agregado exitosamente';
+  } else {
+    $message = 'Error al agregar el producto';
+  }
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,56 +84,40 @@
               <thead class="table-dark">
                 <tr>
                   <th>#</th>
-                  <th>Nombre</th>
                   <th>Descripción</th>
                   <th>Precio</th>
                   <th>Existencias</th>
-                  <th>Imagen</th>
+                  <th>Tipo tueste</th>
+                  <th>Procesado</th>
+                  <th>Especie</th>
                   <th>Activo</th>
                   <th></th>
                 </tr>
               </thead>
+
               <tbody>
-                <tr>
-                  <th scope="row">1</th>
-                  <td>Espresso</td>
-                  <td>Café fuerte y concentrado</td>
-                  <td>$1.50</td>
-                  <td>100</td>
-                  <td><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-pesjWnkw4noNqA1WXxZ8ZbbGeTo_KCnMyg&s" alt="" width="150" height="100"></td>
-                  <td>Si</td>
-                  <td><a href="./editarProducto.php" class="btn btn-primary">Editar</a> <a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
-                <tr>
-                  <th scope="row">2</th>
-                  <td>Café con Leche</td>
-                  <td>Café suave con leche caliente</td>
-                  <td>$2.50</td>
-                  <td>50</td>
-                  <td><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-pesjWnkw4noNqA1WXxZ8ZbbGeTo_KCnMyg&s" alt="" width="150" height="100"></td>
-                  <td>Si</td>
-                  <td><a href="#" class="btn btn-primary">Editar</a> <a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
-                <tr>
-                  <th scope="row">3</th>
-                  <td>Cappuccino</td>
-                  <td>Café espresso con leche y espuma</td>
-                  <td>$3.50</td>
-                  <td>20</td>
-                  <td><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-pesjWnkw4noNqA1WXxZ8ZbbGeTo_KCnMyg&s" alt="" width="150" height="100"></td>
-                  <td>Si</td>
-                  <td><a href="./editarProducto.php" class="btn btn-primary">Editar</a> <a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
-                <tr>
-                  <th scope="row">4</th>
-                  <td>Mocha</td>
-                  <td>Café espresso con chocolate y leche</td>
-                  <td>$4.00</td>
-                  <td>30</td>
-                  <td><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-pesjWnkw4noNqA1WXxZ8ZbbGeTo_KCnMyg&s" alt="" width="150" height="100"></td>
-                  <td>Si</td>
-                  <td><a href="./editarProducto.php" class="btn btn-primary">Editar</a> <a href="#" class="btn btn-danger">Eliminar</a></td>
-                </tr>
+
+                <?php
+                foreach ($view_productos as $user) {
+
+                ?>
+                  <tr>
+                    <th scope="row"><?= $user['id_producto'] ?></th>
+                    <td><?= $user['descripcion'] ?></td>
+                    <td><?= $user['precio'] ?></td>
+                    <td><?= $user['existencias'] ?></td>
+                    <td><?= $user['tipo_tueste'] ?></td>
+                    <td><?= $user['tipo_proceso'] ?></td>
+                    <td><?= $user['especie_cafe'] ?></td>
+                    <td><?= $user['activo'] ? 'Si' : 'No' ?></td>
+                    <td>
+                      <a href="./editarProducto.php?id=<?= $user['id_producto'] ?>" class="btn btn-outline-primary">Editar</a>
+                      <a href="./procesarEliminar.php?id=<?= $user['id_producto'] ?>" class="btn btn-outline-danger">Eliminar</a>
+                    </td>
+                  </tr>
+                <?php
+                }
+                ?>
               </tbody>
             </table>
           </div>
@@ -114,52 +128,78 @@
 
   <div id="agregarProducto" class="modal fade" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md">
-      <div class="modal-content">
+      <div class="modal-content m-3">
         <div class="modal-header text-white" style="background-color: black;">
-          <h5 class="modal-title " >Agregar Prodcuto</h5>
+          <h5 class="modal-title ">Agregar Prodcuto</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="background-color:gold;"></button>
         </div>
-        <form th:action="@{/producto/guardar}" th:object="${producto}" method="POST" class="was-validated" enctype="multipart/form-data">
-          <div class="modal-body">
+        <div class="m-3">
+          <form action="stock.php" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
-            <div class="mb-3">
-              <label for="codigo">Código</label>
-              <input type="number" class="form-control" name="codigo" required="true" />
-            </div>
+              <label for="especie_cafe" class="form-label">Especie de Café</label>
+              <input type="text" class="form-control" id="especie_cafe" name="especie_cafe" required>
             </div>
             <div class="mb-3">
-              <label for="nombre">Nombre</label>
-              <input type="text" class="form-control" name="nombre" required="true" />
+              <label for="tipo_proceso" class="form-label">Tipo de Proceso</label>
+              <input type="text" class="form-control" id="tipo_proceso" name="tipo_proceso" required>
             </div>
             <div class="mb-3">
-              <label for="descripcion">Descripción</label>
-              <textarea class="form-control" name="descripcion" required="true"></textarea>
+              <label for="tipo_tueste" class="form-label">Tipo de Tueste</label>
+              <input type="text" class="form-control" id="tipo_tueste" name="tipo_tueste" required>
             </div>
             <div class="mb-3">
-              <label for="precio">Precio</label>
-              <input type="number" class="form-control" name="precio" required="true" />
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descripcion" name="descripcion" required></textarea>
             </div>
             <div class="mb-3">
-              <label for="categoria">Existencias</label>
-              <input type="number" class="form-control" name="existencias" required="true" />
+              <label for="precio" class="form-label">Precio</label>
+              <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
             </div>
             <div class="mb-3">
-              <label for="imagen">Imagen Producto</label>
-              <input class="form-control" type="file" name="imagenFile" onchange="readURL(this);" />
-              <img id="blah" src="#" alt="your image" height="200" />
+              <label for="existencias" class="form-label">Existencias</label>
+              <input type="number" class="form-control" id="existencias" name="existencias" required>
             </div>
             <div class="mb-3">
-              <label for="activo">Activo</label>
-              <input class="form-check-input" type="checkbox" name="activo" id="activo" />
+              <label for="ruta_imagen" class="form-label">Ruta Imagen</label>
+              <input type="text" class="form-control" id="ruta_imagen" name="ruta_imagen">
             </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-primary" type="submit">Guardar</button>
-          </div>
-        </form>
+            <div class="mb-3">
+              <label for="activo" class="form-check-label">Activo</label>
+              <input type="checkbox" class="form-check-input" id="activo" name="activo">
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar Producto</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
+  <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="messageModalLabel">Resultado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <?php if (isset($message)) : ?>
+            <?= htmlspecialchars($message) ?>
+          <?php endif; ?>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+      if (<?= json_encode(isset($message) && !empty($message)) ?>) {
+        messageModal.show();
+      }
+    });
+  </script>
   <footer>
     <?php
     include 'footer.php';

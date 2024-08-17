@@ -1,3 +1,35 @@
+<?php
+require_once('../controller/empleadosController.php');
+require_once('../model/conexionModel.php');
+
+session_start();
+
+$id_empleado = $_GET['id'];
+
+$message = isset($_GET['message']) ? htmlspecialchars($_GET['message']) : '';
+
+$empleadosController = new empleadosController();
+
+$empleado = null;
+try {
+    $empleados = $empleadosController->view_get_Empleados();
+    foreach ($empleados as $empl) {
+        if ($empl['id_empleado'] == $id_empleado) {
+            $empleado = $empl;
+            break;
+        }
+    }
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+    exit();
+}
+
+if ($empleado == null) {
+    header("Location: empleados.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,26 +68,29 @@
 
     <h1 class="display-6 text-center m-5">Editar Empleado</h1>
 
+    <?php if (!empty($message)) : ?>
+        <div class="alert alert-info text-center"><?= $message ?></div>
+    <?php endif; ?>
+
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md-8">
-            <form method="POST" th:action="@{/empleado/guardar}" th:object="${empleado}" class="was-validated" enctype="multipart/form-data">
-                <input type="hidden" name="idEmpleado" th:field="*{idEmpleado}" />
-                <input type="hidden" name="rutaImagen" th:field="*{rutaImagen}" />
+            <form method="POST" action="procesarActualizarEmpleado.php" enctype="multipart/form-data">
+            <input type="hidden" name="id_empleado" value="<?= htmlspecialchars($empleado['id_empleado']) ?>" />
+            <input type="hidden" name="fecha_contratacion" value="<?= htmlspecialchars($empleado['fecha_contratacion']) ?>" />
                 <div class="container py-4 mb-4 bg-light">
                     <div class="row">
                         <div class="col-md-4 d-grid">
-                            <a href="./empleados.php" class="btn btn-primary">
+                            <a href="./empleados.php" class="btn btn-outline-primary">
                                 <i class="fas fa-arrow-left"></i> Regresar
                             </a>
                         </div>
                         <div class="col-md-4 d-grid">
-                            <a th:href="@{/empleado/eliminar/}+${empleado.idEmpleado}" class="btn btn-danger">
-                                <i class="fas fa-trash"></i> Eliminar
+                            <a href="./procesarEliminarEmpleado.php?id=<?= $empleado['id_empleado'] ?>" class="btn btn-outline-danger"> <i class="fas fa-trash"></i> Eliminar
                             </a>
                         </div>
                         <div class="col-md-4 d-grid">
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-outline-success">
                                 <i class="fas fa-check"></i> Guardar
                             </button>
                         </div>
@@ -72,35 +107,35 @@
                                     <div class="card-body">
                                         <div class="mb-3">
                                             <label for="nombre">Nombre</label>
-                                            <input type="text" class="form-control" name="nombre" th:field="*{nombre}" required="true">
+                                            <input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($empleado['nombre']) ?>" required="true">
                                         </div>
                                         <div class="mb-3">
                                             <label for="apellidos">Apellidos</label>
-                                            <input type="text" class="form-control" name="apellidos" th:field="*{apellidos}" required="true">
+                                            <input type="text" class="form-control" name="apellidos" value="<?= htmlspecialchars($empleado['apellidos']) ?>" required="true">
                                         </div>
                                         <div class="mb-3">
                                             <label for="salario">Salario</label>
-                                            <input type="number" class="form-control" name="salario" th:field="*{salario}" required="true" />
+                                            <input type="number" class="form-control" name="salario" value="<?= htmlspecialchars($empleado['salario']) ?>" required="true" />
                                         </div>
                                         <div class="mb-3">
-                                            <label for="correo">Correo</label>
-                                            <input type="email" class="form-control" name="correo" th:field="*{correo}" required="true" />
+                                            <label for="email">Correo</label>
+                                            <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($empleado['email']) ?>" required="true" />
                                         </div>
                                         <div class="mb-3">
                                             <label for="telefono">Telefono</label>
-                                            <input type="tel" class="form-control" name="telefono" th:field="*{telefono}" required="true" />
+                                            <input type="tel" class="form-control" name="telefono" value="<?= htmlspecialchars($empleado['telefono']) ?>" required="true" />
                                         </div>
                                         <div class="mb-3">
-                                            <label for="fechaContratacion">Fecha de Contratacion</label>
-                                            <input type="date" class="form-control" name="fechaContratacion" th:field="*{fechaContratacion}" required="true" />
+                                            <label for="fecha_contratacion">Fecha de Contratacion</label>
+                                            <input type="date" class="form-control" name="fecha_contratacion" value="<?= htmlspecialchars($empleado['fecha_contratacion']) ?>" required="true" />
                                         </div>
                                         <div class="mb-3">
-                                            <label for="puesto">Puesto</label>
-                                            <input type="text" class="form-control" name="puesto" th:field="*{puesto}" required="true" />
+                                            <label for="id_puesto">Puesto</label>
+                                            <input type="number" class="form-control" name="id_puesto" value="<?= htmlspecialchars($empleado['id_puesto']) ?>" required="true" />
                                         </div>
                                         <div class="mb-3">
                                             <label for="activo">Activo</label>
-                                            <input class="form-check-input" type="checkbox" name="activo" id="activo" th:field="*{activo}">
+                                            <input class="form-check-input" type="checkbox" name="activo" id="activo" value="1" <?= $empleado['activo'] ? 'checked' : '' ?>>
                                         </div>
                                     </div>
                                 </div>
